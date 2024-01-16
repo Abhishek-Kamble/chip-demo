@@ -6,7 +6,7 @@ const Home = () => {
     <div>
       <div className="text-4xl">Welcome to Zepto</div>
 
-      <h3>Pick up user...</h3>
+      <div className="text-2xl font-bold text-blue-700">Pick up user...</div>
       <ChipComponent />
     </div>
   );

@@ -1,11 +1,10 @@
-// Install Tailwind CSS by running: npm install tailwindcss
-
 import React, { useState, useEffect, useRef } from "react";
-import data from "./data.json"; // Assuming the JSON file is named data.json and is in the same directory
+import data from "../utils/data.json";
 
 const ChipComponent = () => {
   const [inputValue, setInputValue] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [lastSelectedItemIndex, setLastSelectedItemIndex] = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -16,8 +15,9 @@ const ChipComponent = () => {
     setInputValue(e.target.value);
   };
 
-  const handleItemSelect = (item) => {
+  const handleItemSelect = (item, index) => {
     setSelectedItems([...selectedItems, item]);
+    setLastSelectedItemIndex(index);
     setInputValue("");
   };
 
@@ -40,12 +40,12 @@ const ChipComponent = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col gap-2 p-4 w-2/3 items-center mx-auto">
       <div className="flex flex-wrap gap-2 border p-2 rounded">
-        {selectedItems.map((item) => (
+        {selectedItems.map((item, index) => (
           <div
             key={item}
-            className="flex items-center bg-blue-500 text-white p-2 rounded-full"
+            className="flex items-center bg-gray-300 text-black p-2 rounded-full"
           >
             <img
               src={data.find((i) => i.name === item)?.profilePhoto}
@@ -67,13 +67,13 @@ const ChipComponent = () => {
           ref={inputRef}
           type="text"
           className="flex-grow ml-2 border-none focus:outline-none"
-          placeholder="Add new user"
+          placeholder="Add new user..."
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleBackspace}
         />
       </div>
-      <ul className="list-none p-2 border rounded">
+      <ul className="list-none w-2/3 p-2 border rounded">
         {data
           .filter(
             (item) =>
@@ -82,22 +82,22 @@ const ChipComponent = () => {
                 item.name.toLowerCase().includes(inputValue.toLowerCase()))
           )
           .sort((a, b) => a.name.localeCompare(b.name))
-          .map((item) => (
+          .map((item, index) => (
             <li
               key={item.name}
-              className="cursor-pointer"
-              onClick={() => handleItemSelect(item.name)}
+              className={`cursor-pointer ${
+                index === lastSelectedItemIndex ? "bg-gray-300" : ""
+              }`}
+              onClick={() => handleItemSelect(item.name, index)}
             >
-              <div className="flex items-center">
+              <div className="flex m-1 items-center">
                 <img
                   src={item.profilePhoto}
                   alt=""
                   className="mr-2 w-8 h-8 rounded-full"
                 />
-                <div>
-                  <div>{item.name}</div>
-                  <div className="text-gray-500">{item.email}</div>
-                </div>
+                <div className="m-1">{item.name}</div>
+                <div className="text-gray-500">{item.email}</div>
               </div>
             </li>
           ))}
