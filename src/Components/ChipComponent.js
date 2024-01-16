@@ -1,0 +1,109 @@
+// Install Tailwind CSS by running: npm install tailwindcss
+
+import React, { useState, useEffect, useRef } from "react";
+import data from "./data.json"; // Assuming the JSON file is named data.json and is in the same directory
+
+const ChipComponent = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, [selectedItems]);
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleItemSelect = (item) => {
+    setSelectedItems([...selectedItems, item]);
+    setInputValue("");
+  };
+
+  const handleChipRemove = (item) => {
+    const updatedItems = selectedItems.filter(
+      (selectedItem) => selectedItem !== item
+    );
+    setSelectedItems(updatedItems);
+  };
+
+  const handleBackspace = (e) => {
+    if (
+      e.key === "Backspace" &&
+      inputValue === "" &&
+      selectedItems.length > 0
+    ) {
+      const lastSelected = selectedItems[selectedItems.length - 1];
+      handleChipRemove(lastSelected);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-wrap gap-2 border p-2 rounded">
+        {selectedItems.map((item) => (
+          <div
+            key={item}
+            className="flex items-center bg-blue-500 text-white p-2 rounded-full"
+          >
+            <img
+              src={data.find((i) => i.name === item)?.profilePhoto}
+              alt=""
+              className="mr-2 w-8 h-8 rounded-full"
+            />
+            <div>
+              <div>{item}</div>
+            </div>
+            <span
+              className="cursor-pointer ml-2"
+              onClick={() => handleChipRemove(item)}
+            >
+              X
+            </span>
+          </div>
+        ))}
+        <input
+          ref={inputRef}
+          type="text"
+          className="flex-grow ml-2 border-none focus:outline-none"
+          placeholder="Add new user"
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleBackspace}
+        />
+      </div>
+      <ul className="list-none p-2 border rounded">
+        {data
+          .filter(
+            (item) =>
+              !selectedItems.includes(item.name) &&
+              (inputValue === "" ||
+                item.name.toLowerCase().includes(inputValue.toLowerCase()))
+          )
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((item) => (
+            <li
+              key={item.name}
+              className="cursor-pointer"
+              onClick={() => handleItemSelect(item.name)}
+            >
+              <div className="flex items-center">
+                <img
+                  src={item.profilePhoto}
+                  alt=""
+                  className="mr-2 w-8 h-8 rounded-full"
+                />
+                <div>
+                  <div>{item.name}</div>
+                  <div className="text-gray-500">{item.email}</div>
+                </div>
+              </div>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ChipComponent;
